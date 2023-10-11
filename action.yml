@@ -65,6 +65,15 @@ inputs:
     description: >-
       Directory that contains actions-runner software and scripts. E.g. /home/runner/actions-runner.
     required: false
+  is-runner-for-organization:
+    description: >-
+      Specify here if the runner is for organization or for repository.
+    required: true
+  organization-name:
+    description: >-
+      Name of the organization to which the runner will be registered.
+      This input is required if you use 'is-runner-for-organization' input is set to 'true'.
+    required: false
   pre-runner-script:
     description: >-
       Specifies bash commands to run before the runner starts. It's useful for installing dependencies with apt-get, yum, dnf, etc.

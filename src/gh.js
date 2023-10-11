@@ -22,7 +22,12 @@ async function getRegistrationToken() {
   const octokit = github.getOctokit(config.input.githubToken);
 
   try {
-    const response = await octokit.request('POST /repos/{owner}/{repo}/actions/runners/registration-token', config.githubContext);
+    let response;
+    if (config.input.isRunnerForOrganization === 'true') {
+      response = await octokit.request(`POST /orgs/${config.input.organizationName}/actions/runners/registration-token`, config.githubContext);
+    } else {
+      response = await octokit.request('POST /repos/{owner}/{repo}/actions/runners/registration-token', config.githubContext);
+    }
     core.info('GitHub Registration Token is received');
     return response.data.token;
   } catch (error) {
