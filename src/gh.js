@@ -24,7 +24,7 @@ async function getRegistrationToken() {
   try {
     let response;
     if (config.input.isRunnerForOrganization === 'true') {
-      response = await octokit.request(`POST /orgs/${config.input.organizationName}/actions/runners/registration-token`, config.githubContext);
+      response = await octokit.request('POST /orgs/{organization}/actions/runners/registration-token', { organization: config.input.organizationName });
     } else {
       response = await octokit.request('POST /repos/{owner}/{repo}/actions/runners/registration-token', config.githubContext);
     }
@@ -47,7 +47,11 @@ async function removeRunner() {
   }
 
   try {
-    await octokit.request('DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}', _.merge(config.githubContext, { runner_id: runner.id }));
+    if (config.input.isRunnerForOrganization === 'true') {
+      await octokit.request('DELETE /orgs/{organization}/actions/runners/{runner_id}', { organization: config.input.organizationName, runner_id: runner.id });
+    } else {
+      await octokit.request('DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}', _.merge(config.githubContext, { runner_id: runner.id }));
+    }
     core.info(`GitHub self-hosted runner ${runner.name} is removed`);
     return;
   } catch (error) {
