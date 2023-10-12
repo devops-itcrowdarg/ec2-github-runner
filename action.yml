@@ -69,6 +69,10 @@ inputs:
     description: The organization to get names fromj (if the repo belongs to an organization)
     default: ${{ github.event.organization.login }}
     required: false
+  runner-version:
+    description: The version of the runner to use
+    default: 2.309.0
+    required: false
   pre-runner-script:
     description: >-
       Specifies bash commands to run before the runner starts. It's useful for installing dependencies with apt-get, yum, dnf, etc.
