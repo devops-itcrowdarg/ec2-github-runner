@@ -1,3 +1,11 @@
+# It-Crowd modification
+
+## Support for Organization runners
+
+This forked version of https://github.com/machulav/ec2-github-runner adds support for organization runners.
+
+No new parameters are required, it will automatically detect if the runner is for an organization or a user.
+
 # On-demand self-hosted AWS EC2 runner for GitHub Actions
 
 ⚠️ If you like the project, please consider [supporting Ukraine](https://bit.ly/3KeY7dc) in a [war](https://en.wikipedia.org/wiki/2022_Russian_invasion_of_Ukraine) against russian occupants. Any help would be much appreciated!
