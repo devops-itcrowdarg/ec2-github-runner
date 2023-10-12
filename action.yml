@@ -74,6 +74,10 @@ inputs:
       Name of the organization to which the runner will be registered.
       This input is required if you use 'is-runner-for-organization' input is set to 'true'.
     required: false
+  default-organization-name:
+    description: The org to get names from.
+    default: ${{ github.event.organization.login }}
+    required: false
   pre-runner-script:
     description: >-
       Specifies bash commands to run before the runner starts. It's useful for installing dependencies with apt-get, yum, dnf, etc.

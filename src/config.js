@@ -17,6 +17,7 @@ class Config {
       preRunnerScript: core.getInput('pre-runner-script'),
       isRunnerForOrganization: core.getInput('is-runner-for-organization'),
       organizationName: core.getInput('organization-name'),
+      defaultOrganizationName: core.getInput('default-organization-name'),
     };
 
     const tags = JSON.parse(core.getInput('aws-resource-tags'));
@@ -32,6 +33,11 @@ class Config {
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
     };
+
+    // Function to return "true" in case defaultOrganizationName is present
+    this.isDefaultOrganizationNamePresent = function () {
+      return this.input.defaultOrganizationName !== '';
+    }
 
     //
     // validate input

@@ -92,6 +92,11 @@ async function waitForRunnerRegistered(label) {
       } else {
         waitSeconds += retryIntervalSeconds;
         core.info('Checking...');
+        if (config.isDefaultOrganizationNamePresent()) {
+          core.info(`Organization present: ${config.input.defaultOrganizationName}`);
+        } else {
+          core.info(`Organization NOT present: ${config.input.defaultOrganizationName}`);
+        }
       }
     }, retryIntervalSeconds * 1000);
   });
