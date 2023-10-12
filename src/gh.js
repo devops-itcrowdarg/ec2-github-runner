@@ -72,11 +72,6 @@ async function waitForRunnerRegistered(label) {
   let waitSeconds = 0;
 
   core.info(`Waiting ${quietPeriodSeconds}s for the AWS EC2 instance to be registered in GitHub as a new self-hosted runner`);
-  if (config.isOrganizationNamePresent()) {
-    core.info(`Organization present: ${config.input.organizationName}`);
-  } else {
-    core.info(`Organization NOT present: ${config.input.organizationName}`);
-  }
   await new Promise(r => setTimeout(r, quietPeriodSeconds * 1000));
   core.info(`Checking every ${retryIntervalSeconds}s if the GitHub self-hosted runner is registered`);
 

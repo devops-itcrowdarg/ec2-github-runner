@@ -16,6 +16,7 @@ class Config {
       runnerHomeDir: core.getInput('runner-home-dir'),
       preRunnerScript: core.getInput('pre-runner-script'),
       organizationName: core.getInput('organization-name'),
+      runnerVersion: core.getInput('runner-version'),
     };
 
     const tags = JSON.parse(core.getInput('aws-resource-tags'));
@@ -35,6 +36,15 @@ class Config {
     // Function to return "true" in case organizationName is present
     this.isOrganizationNamePresent = function () {
       return this.input.organizationName !== '';
+    }
+
+    // Function to return different API paths depending on organizationName is present
+    this.getGitHubApiRepoPath = function () {
+      if (this.isOrganizationNamePresent()) {
+        return this.input.organizationName;
+      } else {
+        return `${this.githubContext.owner}/${this.githubContext.repo}`;
+      }
     }
 
     //
