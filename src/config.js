@@ -15,9 +15,7 @@ class Config {
       iamRoleName: core.getInput('iam-role-name'),
       runnerHomeDir: core.getInput('runner-home-dir'),
       preRunnerScript: core.getInput('pre-runner-script'),
-      isRunnerForOrganization: core.getInput('is-runner-for-organization'),
       organizationName: core.getInput('organization-name'),
-      defaultOrganizationName: core.getInput('default-organization-name'),
     };
 
     const tags = JSON.parse(core.getInput('aws-resource-tags'));
@@ -34,9 +32,9 @@ class Config {
       repo: github.context.repo.repo,
     };
 
-    // Function to return "true" in case defaultOrganizationName is present
-    this.isDefaultOrganizationNamePresent = function () {
-      return this.input.defaultOrganizationName !== '';
+    // Function to return "true" in case organizationName is present
+    this.isOrganizationNamePresent = function () {
+      return this.input.organizationName !== '';
     }
 
     //

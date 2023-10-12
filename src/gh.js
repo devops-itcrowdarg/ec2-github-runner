@@ -10,7 +10,7 @@ async function getRunner(label) {
 
   try {
     let runners;
-    if (config.input.isRunnerForOrganization === 'true') {
+    if (config.isOrganizationNamePresent()) {
       runners = await octokit.paginate('GET /orgs/{organization}/actions/runners', { organization: config.input.organizationName });
     } else {
       runners = await octokit.paginate('GET /repos/{owner}/{repo}/actions/runners', config.githubContext);
@@ -28,7 +28,7 @@ async function getRegistrationToken() {
 
   try {
     let response;
-    if (config.input.isRunnerForOrganization === 'true') {
+    if (config.isOrganizationNamePresent()) {
       response = await octokit.request('POST /orgs/{organization}/actions/runners/registration-token', { organization: config.input.organizationName });
     } else {
       response = await octokit.request('POST /repos/{owner}/{repo}/actions/runners/registration-token', config.githubContext);
@@ -52,7 +52,7 @@ async function removeRunner() {
   }
 
   try {
-    if (config.input.isRunnerForOrganization === 'true') {
+    if (config.isOrganizationNamePresent()) {
       await octokit.request('DELETE /orgs/{organization}/actions/runners/{runner_id}', { organization: config.input.organizationName, runner_id: runner.id });
     } else {
       await octokit.request('DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}', _.merge(config.githubContext, { runner_id: runner.id }));
@@ -92,10 +92,10 @@ async function waitForRunnerRegistered(label) {
       } else {
         waitSeconds += retryIntervalSeconds;
         core.info('Checking...');
-        if (config.isDefaultOrganizationNamePresent()) {
-          core.info(`Organization present: ${config.input.defaultOrganizationName}`);
+        if (config.isOrganizationNamePresent()) {
+          core.info(`Organization present: ${config.input.organizationName}`);
         } else {
-          core.info(`Organization NOT present: ${config.input.defaultOrganizationName}`);
+          core.info(`Organization NOT present: ${config.input.organizationName}`);
         }
       }
     }, retryIntervalSeconds * 1000);

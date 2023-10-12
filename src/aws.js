@@ -17,7 +17,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
       './run.sh',
     ];
   } else {
-    if (config.input.isRunnerForOrganization === 'true') {
+    if (config.isOrganizationNamePresent()) {
       return [
         '#!/bin/bash',
         'mkdir actions-runner && cd actions-runner',
@@ -26,7 +26,6 @@ function buildUserDataScript(githubRegistrationToken, label) {
         'case $(uname -m) in aarch64) ARCH="arm64" ;; amd64|x86_64) ARCH="x64" ;; esac && export RUNNER_ARCH=${ARCH}',
         'curl -O -L https://github.com/actions/runner/releases/download/v2.299.1/actions-runner-linux-${RUNNER_ARCH}-2.299.1.tar.gz',
         'tar xzf ./actions-runner-linux-${RUNNER_ARCH}-2.299.1.tar.gz',
-        'echo "test"',
         'export RUNNER_ALLOW_RUNASROOT=1',
         `./config.sh --url https://github.com/${config.input.organizationName} --token ${githubRegistrationToken} --labels ${label}`,
         './run.sh',
