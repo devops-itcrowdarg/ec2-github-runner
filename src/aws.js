@@ -27,7 +27,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
         'curl -O -L https://github.com/actions/runner/releases/download/v2.299.1/actions-runner-linux-${RUNNER_ARCH}-2.299.1.tar.gz',
         'tar xzf ./actions-runner-linux-${RUNNER_ARCH}-2.299.1.tar.gz',
         'export RUNNER_ALLOW_RUNASROOT=1',
-        `./config.sh --url https://github.com/${config.githubContext.organizationName} --token ${githubRegistrationToken} --labels ${label}`,
+        `./config.sh --url https://github.com/${config.input.organizationName} --token ${githubRegistrationToken} --labels ${label}`,
         './run.sh',
       ];
     } else {
@@ -62,7 +62,7 @@ async function startEc2Instance(label, githubRegistrationToken) {
     SecurityGroupIds: [config.input.securityGroupId],
     IamInstanceProfile: { Name: config.input.iamRoleName },
     TagSpecifications: config.tagSpecifications,
-    KeyName: 'juanlb',
+    // KeyName: 'juanlb',
   };
 
   try {
