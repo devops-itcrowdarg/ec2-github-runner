@@ -92,21 +92,6 @@ async function waitForRunnerRegistered(label) {
       } else {
         waitSeconds += retryIntervalSeconds;
         core.info('Checking...');
-        if (config.input.isRunnerForOrganization === 'true') {
-          core.info('1 lee correctamente el true');
-        } else {
-          core.info('1 NO LEE CORRECTAMENTE EL TRUE');
-        }
-        if (config.input.isRunnerForOrganization == 'true') {
-          core.info('2 lee correctamente el true');
-        } else {
-          core.info('2 NO LEE CORRECTAMENTE EL TRUE');
-        }
-        if (config.input.isRunnerForOrganization) {
-          core.info('3 lee correctamente el true');
-        } else {
-          core.info('3 NO LEE CORRECTAMENTE EL TRUE');
-        }
       }
     }, retryIntervalSeconds * 1000);
   });
