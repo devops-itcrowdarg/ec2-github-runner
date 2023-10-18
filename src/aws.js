@@ -49,6 +49,11 @@ async function startEc2Instance(label, githubRegistrationToken) {
     TagSpecifications: config.tagSpecifications,
   };
 
+  // Add KeyName attribute if it is not empty
+  if (config.input.keyName) {
+    params.KeyName = config.input.keyName;
+  }
+
   try {
     const result = await ec2.runInstances(params).promise();
     const ec2InstanceId = result.Instances[0].InstanceId;

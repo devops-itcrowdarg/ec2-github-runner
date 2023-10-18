@@ -17,6 +17,7 @@ class Config {
       preRunnerScript: core.getInput('pre-runner-script'),
       organizationName: core.getInput('organization-name'),
       runnerVersion: core.getInput('runner-version'),
+      keyName: core.getInput('key-name'),
     };
 
     const tags = JSON.parse(core.getInput('aws-resource-tags'));

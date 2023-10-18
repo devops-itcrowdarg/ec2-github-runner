@@ -73,6 +73,11 @@ inputs:
     description: The version of the runner to use
     default: 2.309.0
     required: false
+  key-name:
+    description: >-
+      The name of the EC2 key pair to use for the instance.
+      This is used to securely SSH into the instance.
+    required: false
   pre-runner-script:
     description: >-
       Specifies bash commands to run before the runner starts. It's useful for installing dependencies with apt-get, yum, dnf, etc.
