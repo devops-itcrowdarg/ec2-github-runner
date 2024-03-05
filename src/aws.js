@@ -47,6 +47,18 @@ async function startEc2Instance(label, githubRegistrationToken) {
     SecurityGroupIds: [config.input.securityGroupId],
     IamInstanceProfile: { Name: config.input.iamRoleName },
     TagSpecifications: config.tagSpecifications,
+    BlockDeviceMappings: [
+      {
+        DeviceName: "/dev/sdh", 
+        Ebs: {
+          VolumeSize: 100
+        }
+      }, 
+      {
+        DeviceName: "/dev/sdc", 
+        VirtualName: "ephemeral1"
+      }
+    ], 
   };
 
   // Add KeyName attribute if it is not empty
