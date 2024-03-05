@@ -49,11 +49,15 @@ async function startEc2Instance(label, githubRegistrationToken) {
     TagSpecifications: config.tagSpecifications,
     BlockDeviceMappings: [
       {
-        DeviceName: "/dev/sdh", 
+        DeviceName: "/dev/sda1", 
         Ebs: {
-          VolumeSize: 100
+          VolumeSize: 30
         }
       }, 
+      {
+        DeviceName: "/dev/sdb",
+        VirtualName: "ephemeral0"
+      },
       {
         DeviceName: "/dev/sdc", 
         VirtualName: "ephemeral1"
