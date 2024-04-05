@@ -12,6 +12,7 @@ class Config {
       securityGroupId: core.getInput('security-group-id'),
       label: core.getInput('label'),
       ec2InstanceId: core.getInput('ec2-instance-id'),
+      desiredRunners: core.getInput('desired-runners'),
       iamRoleName: core.getInput('iam-role-name'),
       runnerHomeDir: core.getInput('runner-home-dir'),
       preRunnerScript: core.getInput('pre-runner-script'),

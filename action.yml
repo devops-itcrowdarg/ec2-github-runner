@@ -49,6 +49,13 @@ inputs:
       The id is used to terminate the EC2 instance when the runner is not needed anymore.
       This input is required if you use the 'stop' mode.
     required: false
+  desired-runners:
+    description: >-
+      The desired number of EC2 instances to be created.
+      This number is used to determinate the number of runners that will be created.
+      If no number is specified then it will create only one instance.
+    required: false
+    default: 1
   iam-role-name:
     description: >-
       IAM Role Name to attach to the created EC2 instance.
