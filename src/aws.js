@@ -84,10 +84,11 @@ async function startEc2Instance(label, githubRegistrationToken) {
 async function terminateEc2Instance() {
   // const instanceIds = config.input.ec2InstanceId
   // for (let i = 0; i < instanceIds; i++) {
+    const instanceIds = JSON.parse(config.input.ec2InstanceId);
     const ec2 = new AWS.EC2();
 
     const params = {
-      InstanceIds: config.input.ec2InstanceId,
+      InstanceIds: instanceIds,
     };
 
     try {
