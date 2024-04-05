@@ -33,53 +33,51 @@ function buildUserDataScript(githubRegistrationToken, label) {
 }
 
 async function startEc2Instance(label, githubRegistrationToken) {
-  for (let i = 0; i < config.input.desiredRunners; i++) {
-    const ec2 = new AWS.EC2();
+  const ec2 = new AWS.EC2();
 
-    const userData = buildUserDataScript(githubRegistrationToken, label);
+  const userData = buildUserDataScript(githubRegistrationToken, label);
 
-    const params = {
-      ImageId: config.input.ec2ImageId,
-      InstanceType: config.input.ec2InstanceType,
-      MinCount: 1,
-      MaxCount: 1,
-      UserData: Buffer.from(userData.join('\n')).toString('base64'),
-      SubnetId: config.input.subnetId,
-      SecurityGroupIds: [config.input.securityGroupId],
-      IamInstanceProfile: { Name: config.input.iamRoleName },
-      TagSpecifications: config.tagSpecifications,
-      BlockDeviceMappings: [
-        {
-          DeviceName: "/dev/sda1", 
-          Ebs: {
-            VolumeSize: 30
-          }
-        }, 
-        {
-          DeviceName: "/dev/sdb",
-          VirtualName: "ephemeral0"
-        },
-        {
-          DeviceName: "/dev/sdc", 
-          VirtualName: "ephemeral1"
+  const params = {
+    ImageId: config.input.ec2ImageId,
+    InstanceType: config.input.ec2InstanceType,
+    MinCount: 1,
+    MaxCount: 1,
+    UserData: Buffer.from(userData.join('\n')).toString('base64'),
+    SubnetId: config.input.subnetId,
+    SecurityGroupIds: [config.input.securityGroupId],
+    IamInstanceProfile: { Name: config.input.iamRoleName },
+    TagSpecifications: config.tagSpecifications,
+    BlockDeviceMappings: [
+      {
+        DeviceName: "/dev/sda1", 
+        Ebs: {
+          VolumeSize: 30
         }
-      ], 
-    };
+      }, 
+      {
+        DeviceName: "/dev/sdb",
+        VirtualName: "ephemeral0"
+      },
+      {
+        DeviceName: "/dev/sdc", 
+        VirtualName: "ephemeral1"
+      }
+    ], 
+  };
 
-    // Add KeyName attribute if it is not empty
-    if (config.input.keyName) {
-      params.KeyName = config.input.keyName;
-    }
+  // Add KeyName attribute if it is not empty
+  if (config.input.keyName) {
+    params.KeyName = config.input.keyName;
+  }
 
-    try {
-      const result = await ec2.runInstances(params).promise();
-      const ec2InstanceId = result.Instances[0].InstanceId;
-      core.info(`AWS EC2 instance ${ec2InstanceId} is started`);
-      return ec2InstanceId;
-    } catch (error) {
-      core.error('AWS EC2 instance starting error');
-      throw error;
-    }
+  try {
+    const result = await ec2.runInstances(params).promise();
+    const ec2InstanceId = result.Instances[0].InstanceId;
+    core.info(`AWS EC2 instance ${ec2InstanceId} is started`);
+    return ec2InstanceId;
+  } catch (error) {
+    core.error('AWS EC2 instance starting error');
+    throw error;
   }
 }
 
