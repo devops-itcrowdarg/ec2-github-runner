@@ -11,16 +11,28 @@ function setOutput(labels, ec2InstanceIds) {
 async function start() {
   const labels = [];
   const ec2InstanceIds = [];
+  const tasks = [];
+
   for (let i = 0; i < config.input.desiredRunners; i++) {
-    const label = config.generateUniqueLabel();
-    const githubRegistrationToken = await gh.getRegistrationToken();
-    const ec2InstanceId = await aws.startEc2Instance(label, githubRegistrationToken);
-    
-    await aws.waitForInstanceRunning(ec2InstanceId);
-    await gh.waitForRunnerRegistered(label);
-    labels[i] = label;
-    ec2InstanceIds[i] = ec2InstanceId
+    tasks.push((async () => {
+      const label = config.generateUniqueLabel();
+      const githubRegistrationToken = await gh.getRegistrationToken();
+      const ec2InstanceId = await aws.startEc2Instance(label, githubRegistrationToken);
+      
+      await aws.waitForInstanceRunning(ec2InstanceId);
+      await gh.waitForRunnerRegistered(label);
+      
+      return { label, ec2InstanceId };
+    })());
   }
+
+  const results = await Promise.all(tasks);
+  
+  results.forEach((result, index) => {
+    labels[index] = result.label;
+    ec2InstanceIds[index] = result.ec2InstanceId;
+  });
+
   setOutput(labels, ec2InstanceIds);
 }
 
