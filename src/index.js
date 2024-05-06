@@ -13,8 +13,9 @@ async function start() {
   const ec2InstanceIds = [];
   const tasks = [];
 
-  // Check if config.input.services is an array and get the number of elements inside the array to be used in the for loop
-  for (let i = 0; i < config.input.services.length; i++) {
+  const services = JSON.parse(config.input.services);
+
+  for (let i = 0; i < services.length; i++) {
     tasks.push((async () => {
       const label = config.generateUniqueLabel();
       const githubRegistrationToken = await gh.getRegistrationToken();
