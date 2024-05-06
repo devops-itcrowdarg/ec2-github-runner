@@ -15,25 +15,17 @@ async function start() {
 
   const services = JSON.parse(config.input.services);
   const servicesArr = services.split(",");
-  console.log("input: " + config.input.services);
-  console.log("services: " + services);
-  console.log("services length: " + services.length);
-  console.log("services type: " + typeof(services));
-  console.log("servicesArr: " + servicesArr);
-  console.log("servicesArr length: " + servicesArr.length);
-  console.log("servicesArr type: " + typeof(servicesArr));
 
-  for (let i = 0; i < services.length; i++) {
+  for (let i = 0; i < servicesArr.length; i++) {
     tasks.push((async () => {
       const label = config.generateUniqueLabel();
-      // const githubRegistrationToken = await gh.getRegistrationToken();
-      // // const ec2InstanceId = await aws.startEc2Instance(label, githubRegistrationToken);
+      const githubRegistrationToken = await gh.getRegistrationToken();
+      const ec2InstanceId = await aws.startEc2Instance(label, githubRegistrationToken);
       
-      // await aws.waitForInstanceRunning(ec2InstanceId);
-      // await gh.waitForRunnerRegistered(label);
+      await aws.waitForInstanceRunning(ec2InstanceId);
+      await gh.waitForRunnerRegistered(label);
       
-      // return { label, ec2InstanceId };
-      return { label };
+      return { label, ec2InstanceId };
     })());
   }
 
