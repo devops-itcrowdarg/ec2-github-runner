@@ -14,9 +14,12 @@ async function start() {
   const tasks = [];
 
   const services = JSON.parse(config.input.services);
+  const servicesArr = JSON.parse(config.input.services);
   console.log("input: " + config.input.services);
   console.log("services: " + services);
   console.log("services length: " + services.length);
+  console.log("servicesArr: " + servicesArr);
+  console.log("servicesArr length: " + servicesArr.length);
   for (let i = 0; i < services.length; i++) {
     tasks.push((async () => {
       const label = config.generateUniqueLabel();
