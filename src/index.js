@@ -18,6 +18,7 @@ async function start() {
   console.log("services: " + services);
   console.log("services length: " + services.length);
   console.log("services type: " + typeof(services));
+  console.log("services split: " + services.split(","));
 
   for (let i = 0; i < services.length; i++) {
     tasks.push((async () => {
