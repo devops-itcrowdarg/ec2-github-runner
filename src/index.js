@@ -14,11 +14,14 @@ async function start() {
   const tasks = [];
 
   const services = JSON.parse(config.input.services);
+  const servicesArr = services.split(",");
   console.log("input: " + config.input.services);
   console.log("services: " + services);
   console.log("services length: " + services.length);
   console.log("services type: " + typeof(services));
-  console.log("services split: " + services.split(","));
+  console.log("servicesArr: " + servicesArr);
+  console.log("servicesArr length: " + servicesArr.length);
+  console.log("servicesArr type: " + typeof(servicesArr));
 
   for (let i = 0; i < services.length; i++) {
     tasks.push((async () => {
