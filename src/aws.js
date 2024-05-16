@@ -13,7 +13,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
       `echo "${config.input.preRunnerScript}" > pre-runner-script.sh`,
       'source pre-runner-script.sh',
       'export RUNNER_ALLOW_RUNASROOT=1',
-      `./config.sh --url https://github.com/${config.getGitHubApiRepoPath()} --token ${githubRegistrationToken} --labels ${label}`,
+      `./config.sh --url https://github.com/${config.getGitHubApiRepoPath()} --token ${githubRegistrationToken} --labels ${label},worker`,
       './run.sh',
     ];
   } else {
@@ -26,7 +26,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
       `curl -O -L https://github.com/actions/runner/releases/download/v${config.input.runnerVersion}/actions-runner-linux-$RUNNER_ARCH-${config.input.runnerVersion}.tar.gz`,
       `tar xzf ./actions-runner-linux-$RUNNER_ARCH-${config.input.runnerVersion}.tar.gz`,
       'export RUNNER_ALLOW_RUNASROOT=1',
-      `./config.sh --url https://github.com/${config.getGitHubApiRepoPath()} --token ${githubRegistrationToken} --labels ${label}`,
+      `./config.sh --url https://github.com/${config.getGitHubApiRepoPath()} --token ${githubRegistrationToken} --labels ${label},worker`,
       './run.sh',
     ];
   }
