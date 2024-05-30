@@ -223,13 +223,13 @@ Now you're ready to go!
 | `ec2-instance-type`                                                                                                                                                          | Required if you use the `start` mode.      | EC2 Instance Type.                                                                                                                                                                                                                                                                                                                    |
 | `subnet-id`                                                                                                                                                                  | Required if you use the `start` mode.      | VPC Subnet Id. <br><br> The subnet should belong to the same VPC as the specified security group.                                                                                                                                                                                                                                     |
 | `security-group-id`                                                                                                                                                          | Required if you use the `start` mode.      | EC2 Security Group Id. <br><br> The security group should belong to the same VPC as the specified subnet. <br><br> Only the outbound traffic for port 443 should be allowed. No inbound traffic is required.                                                                                                                          |
-| `label`                                                                                                                                                                      | Required if you use the `stop` mode.       | Name of the unique label assigned to the runner. <br><br> The label is provided by the output of the action in the `start` mode. <br><br> The label is used to remove the runner from GitHub when the runner is not needed anymore.                                                                                                   |
-`ec2-instance-id`                                                                                                                                                            | Required if you use the `stop` mode.       | EC2 Instance Id of the created runner. <br><br> The id is provided by the output of the action in the `start` mode. <br><br> The id is used to terminate the EC2 instance when the runner is not needed anymore.                                                                                                                      |
-`services`                                                                                                                                                            | Required. Used with `start` mode.    | This array is used to determinate the number of runners that will be created. <br><br> If no service is specified then it will fail to start any instances.                                                                                                                      |
+| `labels`                                                                                                                                                                     | Required if you use the `stop` mode.       | Name of the labels assigned to the runners. <br><br> The labels are provided by the output of the action in the `start` mode. <br><br> The labels are used to remove the runner from GitHub when the runner is not needed anymore.                                                                                                   |
+| `ec2-instance-ids`                                                                                                                                                           | Required if you use the `stop` mode.       | EC2 Instance Ids of the created runner. <br><br> The ids are provided by the output of the action in the `start` mode. <br><br> The ids are used to terminate the EC2 instances when the runner is not needed anymore.                                                                                                                      |
+| `services`                                                                                                                                                                   | Required. Used with `start` mode.          | This array is used to determinate the number of runners that will be created. <br><br> If no service is specified then it will fail to start any instances.                                                                                                                      |
 | `iam-role-name`                                                                                                                                                              | Optional. Used only with the `start` mode. | IAM role name to attach to the created EC2 runner. <br><br> This allows the runner to have permissions to run additional actions within the AWS account, without having to manage additional GitHub secrets and AWS users. <br><br> Setting this requires additional AWS permissions for the role launching the instance (see above). |
 | `aws-resource-tags`                                                                                                                                                          | Optional. Used only with the `start` mode. | Specifies tags to add to the EC2 instance and any attached storage. <br><br> This field is a stringified JSON array of tag objects, each containing a `Key` and `Value` field (see example below). <br><br> Setting this requires additional AWS permissions for the role launching the instance (see above).                         |
-| `runner-home-dir`                                                                                                                                                              | Optional. Used only with the `start` mode. | Specifies a directory where pre-installed actions-runner software and scripts are located.<br><br> |
-| `pre-runner-script`                                                                                                                                                              | Optional. Used only with the `start` mode. | Specifies bash commands to run before the runner starts.  It's useful for installing dependencies with apt-get, yum, dnf, etc. For example:<pre>          - name: Start EC2 runner<br>            with:<br>              mode: start<br>              ...<br>              pre-runner-script: \|<br>                 sudo yum update -y && \ <br>                 sudo yum install docker git libicu -y<br>                 sudo systemctl enable docker</pre>
+| `runner-home-dir`                                                                                                                                                            | Optional. Used only with the `start` mode. | Specifies a directory where pre-installed actions-runner software and scripts are located.<br><br> |
+| `pre-runner-script`                                                                                                                                                          | Optional. Used only with the `start` mode. | Specifies bash commands to run before the runner starts.  It's useful for installing dependencies with apt-get, yum, dnf, etc. For example:<pre>          - name: Start EC2 runner<br>            with:<br>              mode: start<br>              ...<br>              pre-runner-script: \|<br>                 sudo yum update -y && \ <br>                 sudo yum install docker git libicu -y<br>                 sudo systemctl enable docker</pre>
 <br><br> |
 
 ### Environment variables
@@ -247,8 +247,8 @@ We recommend using [aws-actions/configure-aws-credentials](https://github.com/aw
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description                                                                                                                                                                                                                               |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `label`                                                                                                                                                                      | Name of the unique label assigned to the runner. <br><br> The label is used in two cases: <br> - to use as the input of `runs-on` property for the following jobs; <br> - to remove the runner from GitHub when it is not needed anymore. |
-| `ec2-instance-id`                                                                                                                                                            | EC2 Instance Id of the created runner. <br><br> The id is used to terminate the EC2 instance when the runner is not needed anymore.                                                                                                       |
+| `labels`                                                                                                                                                                     | Name of the labels assigned to the runners. <br><br> The labels are used to remove the runners from GitHub when they are not needed anymore. |
+| `ec2-instance-ids`                                                                                                                                                           | EC2 Instance Ids of the created runners. <br><br> The ids are used to terminate the EC2 instances when the runners are not needed anymore.                                                                                                       |
 
 ### Example
 
@@ -256,14 +256,19 @@ The workflow showed in the picture above and declared in `do-the-job.yml` looks 
 
 ```yml
 name: do-the-job
-on: pull_request
+  workflow_dispatch:
+    inputs:
+      services:
+        description: "List of Services"
+        required: true
+        default: '["service-name"]'
 jobs:
   start-runner:
     name: Start self-hosted EC2 runner
     runs-on: ubuntu-latest
     outputs:
-      label: ${{ steps.start-ec2-runner.outputs.label }}
-      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+      labels: ${{ steps.start-ec2-runner.outputs.labels }}
+      ec2-instance-ids: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -281,6 +286,7 @@ jobs:
           ec2-instance-type: t3.nano
           subnet-id: subnet-123
           security-group-id: sg-123
+          services: ${{ toJSON(github.event.inputs.services) }}
           iam-role-name: my-role-name # optional, requires additional permissions
           aws-resource-tags: > # optional, requires additional permissions
             [
@@ -288,9 +294,12 @@ jobs:
               {"Key": "GitHubRepository", "Value": "${{ github.repository }}"}
             ]
   do-the-job:
+    strategy:
+      matrix:
+        service: ${{ fromJSON(github.event.inputs.services)}} # required to run the job for each service
     name: Do the job on the runner
     needs: start-runner # required to start the main job when the runner is ready
-    runs-on: ${{ needs.start-runner.outputs.label }} # run the job on the newly created runner
+    runs-on: [self-hosted, worker] # All created runners have the worker label
     steps:
       - name: Hello World
         run: echo 'Hello World!'
@@ -313,8 +322,8 @@ jobs:
         with:
           mode: stop
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
-          label: ${{ needs.start-runner.outputs.label }}
-          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
+          labels: ${{ needs.start-runner.outputs.labels }}
+          ec2-instance-ids: ${{ needs.start-runner.outputs.ec2-instance-ids }}
 ```
 
 ### Real user examples

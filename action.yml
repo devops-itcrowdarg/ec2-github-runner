@@ -37,16 +37,16 @@ inputs:
       The runner doesn't require any inbound traffic. However, outbound traffic should be allowed.
       This input is required if you use the 'start' mode.
     required: false
-  label:
+  labels:
     description: >-
-      Name of the unique label assigned to the runner.
-      The label is used to remove the runner from GitHub when the runner is not needed anymore.
+      Name of the labels assigned to the runners.
+      The labels are used to remove the runners from GitHub when the runners are not needed anymore.
       This input is required if you use the 'stop' mode.
     required: false
-  ec2-instance-id:
+  ec2-instance-ids:
     description: >-
-      EC2 Instance Id of the created runner.
-      The id is used to terminate the EC2 instance when the runner is not needed anymore.
+      EC2 Instance Ids of the created runners.
+      The ids are used to terminate the EC2 instances when the runner is not needed anymore.
       This input is required if you use the 'stop' mode.
     required: false
   services:
@@ -90,16 +90,14 @@ inputs:
     required: false
 
 outputs:
-  label:
+  labels:
     description: >-
-      Name of the unique label assigned to the runner.
-      The label is used in two cases:
-      - to use as the input of 'runs-on' property for the following jobs;
-      - to remove the runner from GitHub when it is not needed anymore.
-  ec2-instance-id:
+      Name of the labels assigned to the runners.
+      The labels are used to remove the runners from GitHub when they are not needed anymore.
+  ec2-instance-ids:
     description: >-
-      EC2 Instance Id of the created runner.
-      The id is used to terminate the EC2 instance when the runner is not needed anymore.
+      EC2 Instance Ids of the created runners.
+      The ids are used to terminate the EC2 instances when the runner is not needed anymore.
 runs:
   using: node16
   main: ./dist/index.js
