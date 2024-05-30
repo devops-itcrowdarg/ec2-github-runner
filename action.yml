@@ -43,6 +43,7 @@ inputs:
       The labels are used to remove the runners from GitHub when the runners are not needed anymore.
       This input is required if you use the 'stop' mode.
     required: false
+    default: '[]'
   ec2-instance-ids:
     description: >-
       EC2 Instance Ids of the created runners.
@@ -54,7 +55,7 @@ inputs:
       An array of services
       The amount of services will determine the amount of worker instances to be used.
     required: false
-    default: 1
+    default: '[]'
   iam-role-name:
     description: >-
       IAM Role Name to attach to the created EC2 instance.

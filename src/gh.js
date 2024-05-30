@@ -43,7 +43,7 @@ async function getRegistrationToken() {
 
 async function removeRunner() {
   const labels = JSON.parse(config.input.labels);
-  for (let i = 0; i < labels; i++) {
+  for (let i = 0; i < labels.length; i++) {
     const runner = await getRunner(labels[i]);
     const octokit = github.getOctokit(config.input.githubToken);
 
