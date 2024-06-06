@@ -12,7 +12,7 @@ Change only files inside `src` folder.
 
 Then run:
 ```bash
-docker run -it --rm -v ./:/app node:18 bash
+docker run -it --rm -v ./:/app node:20 bash
 cd /app
 npm ci
 npm run lint
