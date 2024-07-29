@@ -11,9 +11,13 @@ function buildUserDataScript(githubRegistrationToken, label) {
       '#!/bin/bash',
       `cd "${config.input.runnerHomeDir}"`,
       `echo "${config.input.preRunnerScript}" > pre-runner-script.sh`,
+      `echo "#!/bin/bash" > terminate-itself.sh`,
+      `echo "INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)" >> terminate-itself.sh`,
+      `echo "aws ec2 terminate-instances --instance-ids $INSTANCE_ID | at now + 5 minutes" >> terminate-itself.sh`,
       'source pre-runner-script.sh',
       'export RUNNER_ALLOW_RUNASROOT=1',
       `./config.sh --url https://github.com/${config.getGitHubApiRepoPath()} --token ${githubRegistrationToken} --labels ${label},worker`,
+      `./terminate-itself.sh`,
       './run.sh',
     ];
   } else {
@@ -21,12 +25,16 @@ function buildUserDataScript(githubRegistrationToken, label) {
       '#!/bin/bash',
       'mkdir actions-runner && cd actions-runner',
       `echo "${config.input.preRunnerScript}" > pre-runner-script.sh`,
+      `echo "#!/bin/bash" > terminate-itself.sh`,
+      `echo "INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)" >> terminate-itself.sh`,
+      `echo "aws ec2 terminate-instances --instance-ids $INSTANCE_ID | at now + 5 minutes" >> terminate-itself.sh`,
       'source pre-runner-script.sh',
       'case $(uname -m) in aarch64) ARCH="arm64" ;; amd64|x86_64) ARCH="x64" ;; esac && export RUNNER_ARCH=${ARCH}',
       `curl -O -L https://github.com/actions/runner/releases/download/v${config.input.runnerVersion}/actions-runner-linux-$RUNNER_ARCH-${config.input.runnerVersion}.tar.gz`,
       `tar xzf ./actions-runner-linux-$RUNNER_ARCH-${config.input.runnerVersion}.tar.gz`,
       'export RUNNER_ALLOW_RUNASROOT=1',
       `./config.sh --url https://github.com/${config.getGitHubApiRepoPath()} --token ${githubRegistrationToken} --labels ${label},worker`,
+      `./terminate-itself.sh`,
       './run.sh',
     ];
   }
