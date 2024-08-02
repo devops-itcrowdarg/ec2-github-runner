@@ -62814,13 +62814,13 @@ function buildUserDataScript(githubRegistrationToken, label) {
       `cat << EOF > terminate-itself.sh`,
       `#!/bin/bash`,
       `INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)`,
-      `at now + 10 minutes`,
-      `aws ec2 terminate-instances --instance-ids $INSTANCE_ID`,
+      `at now + 10 minutes <<<"aws ec2 terminate-instances --instance-ids $INSTANCE_ID"`,
       `EOF`,
       `sudo chmod+x terminate-itself.sh`,
       'source pre-runner-script.sh',
       'export RUNNER_ALLOW_RUNASROOT=1',
       `./config.sh --url https://github.com/${config.getGitHubApiRepoPath()} --token ${githubRegistrationToken} --labels ${label},worker`,
+      `./terminate-itself.sh`,
       './run.sh',
     ];
   } else {
@@ -62832,8 +62832,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
       `cat << EOF > terminate-itself.sh`,
       `#!/bin/bash`,
       `INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)`,
-      `at now + 10 minutes`,
-      `aws ec2 terminate-instances --instance-ids $INSTANCE_ID`,
+      `at now + 10 minutes <<<"aws ec2 terminate-instances --instance-ids $INSTANCE_ID"`,
       `EOF`,
       `sudo chmod+x terminate-itself.sh`,
       'case $(uname -m) in aarch64) ARCH="arm64" ;; amd64|x86_64) ARCH="x64" ;; esac && export RUNNER_ARCH=${ARCH}',
@@ -62841,6 +62840,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
       `tar xzf ./actions-runner-linux-$RUNNER_ARCH-${config.input.runnerVersion}.tar.gz`,
       'export RUNNER_ALLOW_RUNASROOT=1',
       `./config.sh --url https://github.com/${config.getGitHubApiRepoPath()} --token ${githubRegistrationToken} --labels ${label},worker`,
+      `./terminate-itself.sh`,
       './run.sh',
     ];
   }
