@@ -10,8 +10,9 @@ class Config {
       ec2InstanceType: core.getInput('ec2-instance-type'),
       subnetId: core.getInput('subnet-id'),
       securityGroupId: core.getInput('security-group-id'),
-      label: core.getInput('label'),
-      ec2InstanceId: core.getInput('ec2-instance-id'),
+      labels: core.getInput('labels'),
+      ec2InstanceIds: core.getInput('ec2-instance-ids'),
+      services: core.getInput('services'),
       iamRoleName: core.getInput('iam-role-name'),
       runnerHomeDir: core.getInput('runner-home-dir'),
       preRunnerScript: core.getInput('pre-runner-script'),
@@ -65,7 +66,7 @@ class Config {
         throw new Error(`Not all the required inputs are provided for the 'start' mode`);
       }
     } else if (this.input.mode === 'stop') {
-      if (!this.input.label || !this.input.ec2InstanceId) {
+      if (!this.input.labels || !this.input.ec2InstanceIds) {
         throw new Error(`Not all the required inputs are provided for the 'stop' mode`);
       }
     } else {

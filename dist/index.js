@@ -62882,20 +62882,21 @@ async function startEc2Instance(label, githubRegistrationToken) {
 }
 
 async function terminateEc2Instance() {
-  const ec2 = new AWS.EC2();
+    const instanceIds = JSON.parse(config.input.ec2InstanceIds);
+    const ec2 = new AWS.EC2();
 
-  const params = {
-    InstanceIds: [config.input.ec2InstanceId],
-  };
+    const params = {
+      InstanceIds: instanceIds,
+    };
 
-  try {
-    await ec2.terminateInstances(params).promise();
-    core.info(`AWS EC2 instance ${config.input.ec2InstanceId} is terminated`);
-    return;
-  } catch (error) {
-    core.error(`AWS EC2 instance ${config.input.ec2InstanceId} termination error`);
-    throw error;
-  }
+    try {
+      await ec2.terminateInstances(params).promise();
+      core.info(`AWS EC2 instance ${config.input.ec2InstanceIds} is terminated`);
+      return;
+    } catch (error) {
+      core.error(`AWS EC2 instance ${config.input.ec2InstanceIds} termination error`);
+      throw error;
+    }
 }
 
 async function waitForInstanceRunning(ec2InstanceId) {
@@ -62939,8 +62940,9 @@ class Config {
       ec2InstanceType: core.getInput('ec2-instance-type'),
       subnetId: core.getInput('subnet-id'),
       securityGroupId: core.getInput('security-group-id'),
-      label: core.getInput('label'),
-      ec2InstanceId: core.getInput('ec2-instance-id'),
+      labels: core.getInput('labels'),
+      ec2InstanceIds: core.getInput('ec2-instance-ids'),
+      services: core.getInput('services'),
       iamRoleName: core.getInput('iam-role-name'),
       runnerHomeDir: core.getInput('runner-home-dir'),
       preRunnerScript: core.getInput('pre-runner-script'),
@@ -62994,7 +62996,7 @@ class Config {
         throw new Error(`Not all the required inputs are provided for the 'start' mode`);
       }
     } else if (this.input.mode === 'stop') {
-      if (!this.input.label || !this.input.ec2InstanceId) {
+      if (!this.input.labels || !this.input.ec2InstanceIds) {
         throw new Error(`Not all the required inputs are provided for the 'stop' mode`);
       }
     } else {
@@ -63064,31 +63066,34 @@ async function getRegistrationToken() {
 }
 
 async function removeRunner() {
-  const runner = await getRunner(config.input.label);
-  const octokit = github.getOctokit(config.input.githubToken);
+  const labels = JSON.parse(config.input.labels);
+  for (let i = 0; i < labels.length; i++) {
+    const runner = await getRunner(labels[i]);
+    const octokit = github.getOctokit(config.input.githubToken);
 
-  // skip the runner removal process if the runner is not found
-  if (!runner) {
-    core.info(`GitHub self-hosted runner with label ${config.input.label} is not found, so the removal is skipped`);
-    return;
-  }
-
-  try {
-    if (config.isOrganizationNamePresent()) {
-      await octokit.request('DELETE /orgs/{organization}/actions/runners/{runner_id}', { organization: config.input.organizationName, runner_id: runner.id });
-    } else {
-      await octokit.request('DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}', _.merge(config.githubContext, { runner_id: runner.id }));
+    // skip the runner removal process if the runner is not found
+    if (!runner) {
+      core.info(`GitHub self-hosted runner with label ${labels[i]} is not found, so the removal is skipped`);
+      return;
     }
-    core.info(`GitHub self-hosted runner ${runner.name} is removed`);
-    return;
-  } catch (error) {
-    core.error('GitHub self-hosted runner removal error');
-    throw error;
+
+    try {
+      if (config.isOrganizationNamePresent()) {
+        await octokit.request('DELETE /orgs/{organization}/actions/runners/{runner_id}', { organization: config.input.organizationName, runner_id: runner.id });
+      } else {
+        await octokit.request('DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}', _.merge(config.githubContext, { runner_id: runner.id }));
+      }
+      core.info(`GitHub self-hosted runner ${runner.name} is removed`);
+      return;
+    } catch (error) {
+      core.error('GitHub self-hosted runner removal error');
+      throw error;
+    }
   }
 }
 
 async function waitForRunnerRegistered(label) {
-  const timeoutMinutes = 5;
+  const timeoutMinutes = 10;
   const retryIntervalSeconds = 10;
   const quietPeriodSeconds = 30;
   let waitSeconds = 0;
@@ -63136,18 +63141,40 @@ const gh = __webpack_require__(56989);
 const config = __webpack_require__(34570);
 const core = __webpack_require__(42186);
 
-function setOutput(label, ec2InstanceId) {
-  core.setOutput('label', label);
-  core.setOutput('ec2-instance-id', ec2InstanceId);
+function setOutput(labels, ec2InstanceIds) {
+  core.setOutput('labels', labels);
+  core.setOutput('ec2-instance-ids', ec2InstanceIds);
 }
 
 async function start() {
-  const label = config.generateUniqueLabel();
-  const githubRegistrationToken = await gh.getRegistrationToken();
-  const ec2InstanceId = await aws.startEc2Instance(label, githubRegistrationToken);
-  setOutput(label, ec2InstanceId);
-  await aws.waitForInstanceRunning(ec2InstanceId);
-  await gh.waitForRunnerRegistered(label);
+  const labels = [];
+  const ec2InstanceIds = [];
+  const tasks = [];
+
+  const services = JSON.parse(config.input.services);
+  const servicesArr = services.split(",");
+
+  for (let i = 0; i < servicesArr.length; i++) {
+    tasks.push((async () => {
+      const label = config.generateUniqueLabel();
+      const githubRegistrationToken = await gh.getRegistrationToken();
+      const ec2InstanceId = await aws.startEc2Instance(label, githubRegistrationToken);
+      
+      await aws.waitForInstanceRunning(ec2InstanceId);
+      await gh.waitForRunnerRegistered(label);
+      
+      return { label, ec2InstanceId };
+    })());
+  }
+
+  const results = await Promise.all(tasks);
+  
+  results.forEach((result, index) => {
+    labels[index] = result.label;
+    ec2InstanceIds[index] = result.ec2InstanceId;
+  });
+
+  setOutput(labels, ec2InstanceIds);
 }
 
 async function stop() {
